@@ -284,6 +284,7 @@ bool MeshParser::geometryAttributesFromJSON(Qt3DRender::QGeometry *geometry,
         attribute->setProperty("bufferViewIndex", accessor.bufferViewIndex);
         attribute->setProperty("bufferViewOffset", viewData.byteOffset);
         attribute->setProperty("bufferName", accessor.name);
+        attribute->setProperty("semanticName", attrName);
         geometry->addAttribute(attribute);
     }
 
@@ -451,6 +452,7 @@ bool MeshParser::geometryAttributesDracoFromJSON(Qt3DRender::QGeometry *geometry
         attribute->setProperty("bufferViewIndex", accessor.bufferViewIndex);
         attribute->setProperty("bufferViewOffset", accessor.offset);
         attribute->setProperty("bufferName", accessor.name);
+        attribute->setProperty("semanticName", attrName);
 
         geometry->addAttribute(attribute);
     }
