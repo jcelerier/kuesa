@@ -38,6 +38,7 @@
 //
 
 #include <QVector>
+#include <QJsonDocument>
 #include "bufferparser_p.h"
 #include "bufferviewsparser_p.h"
 #include "cameraparser_p.h"
@@ -145,6 +146,9 @@ public:
     QStringList requiredExtensions() const;
     void setRequiredExtensions(const QStringList &requiredExtensions);
 
+    const QJsonDocument& json() const;
+    void setJson(const QJsonDocument& doc);
+
 private:
     QVector<Accessor> m_accessors;
     QVector<QByteArray> m_buffers;
@@ -162,6 +166,7 @@ private:
     QVector<Skin> m_skins;
     QStringList m_usedExtensions;
     QStringList m_requiredExtensions;
+    QJsonDocument m_json;
 };
 
 template<>
