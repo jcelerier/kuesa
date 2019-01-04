@@ -146,8 +146,8 @@ public:
     QStringList requiredExtensions() const;
     void setRequiredExtensions(const QStringList &requiredExtensions);
 
-    const QJsonDocument& json() const;
-    void setJson(const QJsonDocument& doc);
+    const QJsonDocument &json() const;
+    void setJson(const QJsonDocument &doc);
 
 private:
     QVector<Accessor> m_accessors;
