@@ -40,24 +40,24 @@ class GLTF2Context;
 class KUESASHARED_EXPORT GLTF2Exporter : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(GLTF2Context* context READ context WRITE setContext NOTIFY contextChanged)
+    Q_PROPERTY(GLTF2Context *context READ context WRITE setContext NOTIFY contextChanged)
 
 public:
     explicit GLTF2Exporter(QObject *parent = nullptr);
 
-    GLTF2Context* context() const;
+    GLTF2Context *context() const;
 
 signals:
-    void contextChanged(GLTF2Context* context);
+    void contextChanged(GLTF2Context *context);
 
 public slots:
     void save(QUrl target);
-    void setContext(GLTF2Context* context);
+    void setContext(GLTF2Context *context);
 
 private:
-    GLTF2Context* m_context;
+    GLTF2Context *m_context;
 };
-}
+} // namespace Kuesa
 QT_END_NAMESPACE
 
 #endif // GLTF2EXPORTER_H

@@ -34,9 +34,9 @@
 QT_BEGIN_NAMESPACE
 
 namespace Kuesa {
-GLTF2Exporter::GLTF2Exporter(QObject *parent) : QObject(parent)
+GLTF2Exporter::GLTF2Exporter(QObject *parent)
+    : QObject(parent)
 {
-
 }
 
 GLTF2Context *GLTF2Exporter::context() const
@@ -46,17 +46,15 @@ GLTF2Context *GLTF2Exporter::context() const
 
 void GLTF2Exporter::save(QUrl target)
 {
-    if(!m_context)
-    {
-      qCWarning(kuesa, "Tried to save GLTF without a context");
-      return;
+    if (!m_context) {
+        qCWarning(kuesa, "Tried to save GLTF without a context");
+        return;
     }
 
-    QFile out{target.toLocalFile()};
-    if(!out.open(QIODevice::WriteOnly))
-    {
-      qCWarning(kuesa, "Could not open file to save GLTF");
-      return;
+    QFile out { target.toLocalFile() };
+    if (!out.open(QIODevice::WriteOnly)) {
+        qCWarning(kuesa, "Could not open file to save GLTF");
+        return;
     }
 
     auto ctx = GLTF2Import::GLTF2ContextPrivate::get(m_context);
@@ -71,6 +69,6 @@ void GLTF2Exporter::setContext(GLTF2Context *context)
     m_context = context;
     emit contextChanged(m_context);
 }
-}
+} // namespace Kuesa
 
 QT_END_NAMESPACE

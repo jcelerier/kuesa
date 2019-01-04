@@ -352,7 +352,7 @@ const QJsonDocument &GLTF2ContextPrivate::json() const
     return m_json;
 }
 
-void GLTF2ContextPrivate::setJson(const QJsonDocument& doc)
+void GLTF2ContextPrivate::setJson(const QJsonDocument &doc)
 {
     m_json = doc;
 }
