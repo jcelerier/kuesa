@@ -347,6 +347,16 @@ void GLTF2ContextPrivate::setRequiredExtensions(const QStringList &requiredExten
     m_requiredExtensions = requiredExtensions;
 }
 
+const QJsonDocument &GLTF2ContextPrivate::json() const
+{
+    return m_json;
+}
+
+void GLTF2ContextPrivate::setJson(const QJsonDocument& doc)
+{
+    m_json = doc;
+}
+
 template<>
 int GLTF2ContextPrivate::count<Mesh>() const
 {

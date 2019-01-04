@@ -31,6 +31,7 @@
 #include "asset.h"
 #include <Kuesa/SceneEntity>
 #include <Kuesa/GLTF2Importer>
+#include <Kuesa/GLTF2Exporter>
 #include <Kuesa/ForwardRenderer>
 #include <Kuesa/MetallicRoughnessMaterial>
 #include <Kuesa/BloomEffect>
@@ -73,6 +74,7 @@ void KuesaPlugin::registerTypes(const char *uri)
 
     // Misc
     qmlRegisterType<Kuesa::GLTF2Importer>(uri, 1, 0, "GLTF2Importer");
+    qmlRegisterType<Kuesa::GLTF2Exporter>(uri, 1, 0, "GLTF2Exporter");
     qmlRegisterType<Kuesa::SceneEntity>(uri, 1, 0, "SceneEntity");
     qmlRegisterType<Kuesa::MetallicRoughnessMaterial>(uri, 1, 0, "MetallicRoughnessMaterial");
     qmlRegisterType<Kuesa::Skybox>(uri, 1, 0, "Skybox");
