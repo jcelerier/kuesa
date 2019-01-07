@@ -58,7 +58,7 @@ void GLTF2Exporter::save(QUrl target)
     }
 
     auto ctx = GLTF2Import::GLTF2ContextPrivate::get(m_context);
-    out.write(ctx->json().toJson());
+    out.write(updateDocument(ctx->json()).toJson());
 }
 
 void GLTF2Exporter::setContext(GLTF2Context *context)
@@ -68,6 +68,14 @@ void GLTF2Exporter::setContext(GLTF2Context *context)
 
     m_context = context;
     emit contextChanged(m_context);
+}
+
+QJsonDocument GLTF2Exporter::updateDocument(QJsonDocument doc) const Q_DECL_NOEXCEPT
+{
+    // Buffer compression handling
+
+
+    return doc;
 }
 } // namespace Kuesa
 
