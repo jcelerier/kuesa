@@ -47,14 +47,15 @@ public:
 
     GLTF2Context *context() const;
 
-signals:
+Q_SIGNALS:
     void contextChanged(GLTF2Context *context);
 
-public slots:
+public Q_SLOTS:
     void save(QUrl target);
     void setContext(GLTF2Context *context);
 
 private:
+    QJsonDocument updateDocument(QJsonDocument) const Q_DECL_NOEXCEPT;
     GLTF2Context *m_context;
 };
 } // namespace Kuesa
