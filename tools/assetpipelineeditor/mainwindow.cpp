@@ -348,6 +348,7 @@ void MainWindow::openFile()
 void MainWindow::compressFile()
 {
     QFile gltfFile(QUrl(m_filePathURL).toLocalFile());
+    QFileInfo gltfFileInfo(gltfFile);
     if (gltfFile.open(QIODevice::ReadOnly)) {
         QJsonDocument gltfDocument = QJsonDocument::fromJson(gltfFile.readAll());
         gltfFile.close();
@@ -362,10 +363,14 @@ void MainWindow::compressFile()
         exporter.setContext(importer->context());
         exporter.setScene(m_entity);
         rootObject = exporter.compress(QFileInfo(gltfFile).dir(), rootObject);
+        if(rootObject.empty())
+            return;
 
-        if (gltfFile.open(QIODevice::WriteOnly)) {
-            gltfFile.write(QJsonDocument(rootObject).toJson());
-            gltfFile.close();
+        QFile outFile(gltfFileInfo.absolutePath() + "/" + gltfFileInfo.baseName() + "-compressed.gltf");
+        qDebug() << outFile.fileName();
+        if (outFile.open(QIODevice::WriteOnly)) {
+            outFile.write(QJsonDocument(rootObject).toJson());
+            outFile.close();
         }
     }
 }

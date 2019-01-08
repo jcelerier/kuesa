@@ -62,9 +62,8 @@ public:
     QUrl source() const;
     GLTF2Importer::Status status() const;
     Kuesa::SceneEntity *sceneEntity() const;
-    Kuesa::GLTF2Context* context() const;
+    Kuesa::GLTF2Context *context() const;
     bool assignNames() const;
-
 
 public Q_SLOTS:
     void setSource(const QUrl &source);

@@ -50,16 +50,16 @@ public:
     explicit GLTF2Exporter(QObject *parent = nullptr);
 
     GLTF2Context *context() const;
-    SceneEntity * scene() const;
+    SceneEntity *scene() const;
 
 Q_SIGNALS:
     void contextChanged(GLTF2Context *context);
-    void sceneChanged(SceneEntity * scene);
+    void sceneChanged(SceneEntity *scene);
 
 public Q_SLOTS:
     void save(QUrl target);
     void setContext(GLTF2Context *context);
-    void setScene(SceneEntity * scene);
+    void setScene(SceneEntity *scene);
 
     QJsonObject compress(QDir folder, QJsonObject rootObject);
 

@@ -69,7 +69,8 @@ HEADERS += \
     $$PWD/skinparser_p.h \
     $$PWD/gltf2context.h \
     $$PWD/gltf2exporter.h \
-    $$PWD/dracocompressor_p.h
+    $$PWD/dracocompressor_p.h \
+    $$PWD/gltf2keys_p.h
 
 qtConfig(kuesa-draco) {
     DEFINES += KUESA_DRACO_COMPRESSION

@@ -14,6 +14,7 @@
 #include <iterator>
 #include <iostream>
 
+namespace Kuesa::Compression {
 namespace {
 draco::GeometryAttribute::Type attributeTypeFromName(const QString &attributeName)
 {
@@ -103,7 +104,7 @@ QByteArray packedDataInBuffer(const QByteArray &inputBuffer,
 }
 
 template<typename T>
-void addAttributeToMesh(const Qt3DRender::QAttribute &attribute, draco::Mesh &mesh)
+std::pair<QString, int> addAttributeToMesh(const Qt3DRender::QAttribute &attribute, draco::Mesh &mesh)
 {
     const auto dracoAttributeType = attributeTypeFromName(attribute.name());
     const auto dracoDataType = attribute_type_trait<T>::type;
@@ -128,8 +129,13 @@ void addAttributeToMesh(const Qt3DRender::QAttribute &attribute, draco::Mesh &me
                        attribute.vertexSize() * sizeof(T),
                        0);
     auto attId = mesh.AddAttribute(meshAttribute, true, attribute.count());
+    if (attId == -1)
+        return { {}, -1 };
+
     for (unsigned int i = 0; i < attribute.count(); ++i)
         mesh.attribute(attId)->SetAttributeValue(draco::AttributeValueIndex(i), &packedData.data()[i * attribute.vertexSize() * sizeof(T)]);
+
+    return { attribute.name(), attId };
 }
 
 template<typename T>
@@ -162,9 +168,10 @@ void addFacesToMesh(const QVector<T> &indices, draco::Mesh &dracoMesh)
 }
 } // namespace
 
-std::unique_ptr<draco::EncoderBuffer> compressMesh(const Qt3DRender::QGeometry &geometry)
+CompressedMesh compressMesh(const Qt3DRender::QGeometry &geometry)
 {
-    std::unique_ptr<draco::EncoderBuffer> compressBuffer = std::unique_ptr<draco::EncoderBuffer>(new draco::EncoderBuffer);
+    std::unique_ptr<draco::EncoderBuffer> compressBuffer(new draco::EncoderBuffer);
+    std::vector<std::pair<QString, int>> attributes;
     draco::Mesh dracoMesh;
 
     std::unordered_map<Qt3DRender::QBuffer *, draco::DataBuffer *> attributeBufferToDataBuffer;
@@ -183,9 +190,14 @@ std::unique_ptr<draco::EncoderBuffer> compressMesh(const Qt3DRender::QGeometry &
         }
 
         switch (attribute->vertexBaseType()) {
-        case Qt3DRender::QAttribute::VertexBaseType::Float:
-            addAttributeToMesh<float>(*attribute, dracoMesh);
+        case Qt3DRender::QAttribute::VertexBaseType::Float: {
+            auto compressedAttr = addAttributeToMesh<float>(*attribute, dracoMesh);
+            if (compressedAttr.second == -1)
+                return {};
+
+            attributes.push_back(compressedAttr);
             break;
+        }
         default:
             break;
         }
@@ -245,5 +257,6 @@ std::unique_ptr<draco::EncoderBuffer> compressMesh(const Qt3DRender::QGeometry &
     std::ofstream stream;
     stream.open("/home/kdab/data.drc");
     draco::WriteMeshIntoStream(&dracoMesh, stream);
-    return compressBuffer;
+    return { std::move(compressBuffer), attributes };
 }
+} // namespace Kuesa::Compression
