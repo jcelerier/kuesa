@@ -45,6 +45,7 @@ class KUESASHARED_EXPORT GLTF2Importer : public Qt3DCore::QNode
     Q_PROPERTY(QUrl source READ source WRITE setSource NOTIFY sourceChanged)
     Q_PROPERTY(Kuesa::GLTF2Importer::Status status READ status NOTIFY statusChanged)
     Q_PROPERTY(Kuesa::SceneEntity *sceneEntity READ sceneEntity WRITE setSceneEntity NOTIFY sceneEntityChanged)
+    Q_PROPERTY(Kuesa::GLTF2Context *context READ context)
     Q_PROPERTY(bool assignNames READ assignNames WRITE setAssignNames NOTIFY assignNamesChanged)
 public:
     enum Status {
@@ -61,7 +62,9 @@ public:
     QUrl source() const;
     GLTF2Importer::Status status() const;
     Kuesa::SceneEntity *sceneEntity() const;
+    Kuesa::GLTF2Context* context() const;
     bool assignNames() const;
+
 
 public Q_SLOTS:
     void setSource(const QUrl &source);
