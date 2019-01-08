@@ -7,7 +7,7 @@
 namespace Qt3DRender
 {
 class QGeometry;
-};
+}
 
 std::unique_ptr<draco::EncoderBuffer> compressMesh(const Qt3DRender::QGeometry &geometry);
 

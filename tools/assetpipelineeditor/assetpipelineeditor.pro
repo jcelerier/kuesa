@@ -47,8 +47,7 @@ SOURCES += \
     textureinspector.cpp \
     texturepreviewmaterial.cpp \
     settingsdialog.cpp \
-    orbitcameracontroller.cpp \
-    dracocompressor.cpp
+    orbitcameracontroller.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -67,8 +66,7 @@ HEADERS += \
     textureinspector.h \
     texturepreviewmaterial.h \
     settingsdialog.h \
-    orbitcameracontroller.h \
-    dracocompressor.h
+    orbitcameracontroller.h
 
 FORMS += \
     animationwidget.ui \

@@ -37,7 +37,6 @@
 #include "animationwidget.h"
 #include "camerawidget.h"
 #include "orbitcameracontroller.h"
-#include "dracocompressor.h"
 
 #include <QQmlEngine>
 #include <QQmlContext>
@@ -56,7 +55,9 @@
 #include <QJsonValue>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <GLTF2Importer>
 
+#include <Kuesa/GLTF2Exporter>
 #include <Kuesa/SceneEntity>
 #include <private/kuesa_utils_p.h>
 
@@ -349,31 +350,19 @@ void MainWindow::compressFile()
     QFile gltfFile(QUrl(m_filePathURL).toLocalFile());
     if (gltfFile.open(QIODevice::ReadOnly)) {
         QJsonDocument gltfDocument = QJsonDocument::fromJson(gltfFile.readAll());
-        auto rootObject = gltfDocument.object();
-        auto buffersArray = rootObject["buffers"].toArray();
-        const auto nbBuffers = buffersArray.size();
-
-        QByteArray compressedBufferData;
-        // Meshes are added in to the scene entity as they appear as primitives in the mesh attribute
-        for (const auto &meshName : m_entity->meshes()->names()) {
-            const auto encodedBuffer = compressMesh(*m_entity->mesh(meshName)->geometry());
-            compressedBufferData.push_back(QByteArray { encodedBuffer.get()->data(), static_cast<int>(encodedBuffer.get()->size()) });
-        }
-
-        const QFileInfo gltfFileInfo(m_filePathURL);
-        const QDir gltfFileDir = gltfFileInfo.dir();
-        QFile compressedBufferFile(
-                QUrl(gltfFileDir.filePath({ "compressedBuffer.bin" })).toLocalFile());
-        if (compressedBufferFile.open(QIODevice::WriteOnly))
-            compressedBufferFile.write(compressedBufferData);
-
-        QJsonObject compressedBufferObject;
-        compressedBufferObject["byteLength"] = compressedBufferData.size();
-        compressedBufferObject["uri"] = QUrl(gltfFileDir.filePath({ "compressedBuffer.bin" })).toLocalFile();
-        buffersArray.push_back(compressedBufferObject);
-        rootObject["buffers"] = buffersArray;
-
         gltfFile.close();
+
+        auto rootObject = gltfDocument.object();
+
+        auto importer = m_entity->findChild<Kuesa::GLTF2Importer*>();
+        if(!importer)
+            return;
+
+        Kuesa::GLTF2Exporter exporter;
+        exporter.setContext(importer->context());
+        exporter.setScene(m_entity);
+        rootObject = exporter.compress(QFileInfo(gltfFile).dir(), rootObject);
+
         if (gltfFile.open(QIODevice::WriteOnly)) {
             gltfFile.write(QJsonDocument(rootObject).toJson());
             gltfFile.close();

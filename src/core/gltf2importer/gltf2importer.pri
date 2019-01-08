@@ -45,7 +45,9 @@ SOURCES += \
     $$PWD/sceneparser.cpp \
     $$PWD/materialparser.cpp \
     $$PWD/skinparser.cpp \
-    $$PWD/gltf2exporter.cpp
+    $$PWD/gltf2exporter.cpp \
+    $$PWD/dracocompressor_p.cpp
+
 
 HEADERS += \
     $$PWD/bufferparser_p.h \
@@ -66,9 +68,13 @@ HEADERS += \
     $$PWD/materialparser_p.h \
     $$PWD/skinparser_p.h \
     $$PWD/gltf2context.h \
-    $$PWD/gltf2exporter.h
+    $$PWD/gltf2exporter.h \
+    $$PWD/dracocompressor_p.h
 
 qtConfig(kuesa-draco) {
     DEFINES += KUESA_DRACO_COMPRESSION
     LIBS += -ldraco -ldracodec
+
+    SOURCES +=
+    HEADERS +=
 }

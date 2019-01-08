@@ -26,9 +26,11 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 #include <QFile>
+#include <SceneEntity>
 #include "gltf2exporter.h"
 #include "gltf2context.h"
 #include "gltf2context_p.h"
+#include "dracocompressor_p.h"
 #include "kuesa_p.h"
 
 QT_BEGIN_NAMESPACE
@@ -42,6 +44,11 @@ GLTF2Exporter::GLTF2Exporter(QObject *parent)
 GLTF2Context *GLTF2Exporter::context() const
 {
     return m_context;
+}
+
+SceneEntity *GLTF2Exporter::scene() const
+{
+    return m_scene;
 }
 
 void GLTF2Exporter::save(QUrl target)
@@ -68,6 +75,62 @@ void GLTF2Exporter::setContext(GLTF2Context *context)
 
     m_context = context;
     emit contextChanged(m_context);
+}
+
+QJsonObject GLTF2Exporter::compress(
+        QDir gltfFileDir,
+        QJsonObject rootObject)
+{
+    auto buffers = rootObject["buffers"].toArray();
+    auto bufferViews = rootObject["bufferViews"].toArray();
+    const auto nbBuffers = buffers.size();
+
+    QByteArray compressedBufferData;
+    // Meshes are added in to the scene entity as they appear as primitives in the mesh attribute
+
+    // TODO if we have an already-compressed mesh, we should skip it
+    // We must keep a link to the bufferView in the Mesh here
+    for (const auto &meshName : m_scene->meshes()->names()) {
+        const auto encodedBuffer = compressMesh(*m_scene->mesh(meshName)->geometry());
+        compressedBufferData.push_back(QByteArray { encodedBuffer.get()->data(), static_cast<int>(encodedBuffer.get()->size()) });
+    }
+
+    // Remove the compressed data from the original buffers and resave them (for now, in a "compressed" folder)
+
+    // Adjust the bufferView arrays
+    // before.bin: [ A ] [ m1 ] [ B ] [ C ] [ m2 ] [ D ]
+    // after.bin : [ A ] [ B ] [ C ] [ D ]
+    // -> m1, m2 must refer to compressedBuffer.bin
+
+
+    // Adjust the attributes to add the KHR_... extension
+    // https://github.com/KhronosGroup/glTF/blob/master/extensions/2.0/Khronos/KHR_draco_mesh_compression/README.md
+
+
+
+
+    // Save all the compressed data in a monolithic buffer
+    QFile compressedBufferFile(
+            QUrl(gltfFileDir.filePath({ "compressedBuffer.bin" })).toLocalFile());
+    if (compressedBufferFile.open(QIODevice::WriteOnly))
+        compressedBufferFile.write(compressedBufferData);
+
+    QJsonObject compressedBufferObject;
+    compressedBufferObject["byteLength"] = compressedBufferData.size();
+    compressedBufferObject["uri"] = QUrl(gltfFileDir.filePath({ "compressedBuffer.bin" })).toLocalFile();
+    buffers.push_back(compressedBufferObject);
+    rootObject["buffers"] = buffers;
+
+    return rootObject;
+}
+
+void GLTF2Exporter::setScene(SceneEntity *scene)
+{
+    if (m_scene == scene)
+        return;
+
+    m_scene = scene;
+    emit sceneChanged(m_scene);
 }
 
 QJsonDocument GLTF2Exporter::updateDocument(QJsonDocument doc) const Q_DECL_NOEXCEPT

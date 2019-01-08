@@ -31,32 +31,42 @@
 
 #include <QObject>
 #include <QUrl>
+#include <QDir>
+#include <QJsonObject>
 #include <Kuesa/kuesa_global.h>
 
 QT_BEGIN_NAMESPACE
 
 namespace Kuesa {
 class GLTF2Context;
+class SceneEntity;
 class KUESASHARED_EXPORT GLTF2Exporter : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(GLTF2Context *context READ context WRITE setContext NOTIFY contextChanged)
+    Q_PROPERTY(SceneEntity *scene READ scene WRITE setScene NOTIFY sceneChanged)
 
 public:
     explicit GLTF2Exporter(QObject *parent = nullptr);
 
     GLTF2Context *context() const;
+    SceneEntity * scene() const;
 
 Q_SIGNALS:
     void contextChanged(GLTF2Context *context);
+    void sceneChanged(SceneEntity * scene);
 
 public Q_SLOTS:
     void save(QUrl target);
     void setContext(GLTF2Context *context);
+    void setScene(SceneEntity * scene);
+
+    QJsonObject compress(QDir folder, QJsonObject rootObject);
 
 private:
     QJsonDocument updateDocument(QJsonDocument) const Q_DECL_NOEXCEPT;
     GLTF2Context *m_context;
+    SceneEntity *m_scene;
 };
 } // namespace Kuesa
 QT_END_NAMESPACE

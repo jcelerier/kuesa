@@ -1,4 +1,4 @@
-#include "dracocompressor.h"
+#include "dracocompressor_p.h"
 
 #include <Qt3DRender/QGeometry>
 #include <Qt3DRender/QAttribute>
