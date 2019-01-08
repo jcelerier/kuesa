@@ -306,6 +306,14 @@ bool GLTF2Importer::assignNames() const
 }
 
 /*!
+ * Returns the GLTF context, which allows to re-export the GLTF data.
+ */
+GLTF2Context *GLTF2Importer::context() const
+{
+    return m_context;
+}
+
+/*!
  * if \param assignNames is true, assets with no names will be added to
  * collections with default names.
  *
