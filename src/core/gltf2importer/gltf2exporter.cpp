@@ -93,7 +93,9 @@ public:
         // 3. Adjust the accessors: they don't need to point to a bufferView anymore since it's the Draco extension which is aware of them
         // TODO what happens if an accessor was referred by a mesh but also something else ?
         std::set<int> bufferViews_to_clean = pruneBufferViewsFromAccessors(accessors, accessorsToClean);
-        // TODO remove the bufferviews, but this means that we have to update *all* the indices everywhere - not only for meshes.
+
+        // Remove the bufferviews, but this means that we have to update *all* the indices everywhere - not only for meshes.
+        removeBufferViews(bufferViews_to_clean);
 
         // 4. Remove the data from the buffers and adjust the remaining bufferViews
         std::set<int> buffers_to_clean = buffersFromBufferViews(bufferViews, bufferViews_to_clean);
@@ -133,7 +135,7 @@ private:
     // Compress a single mesh
     QJsonObject compressMesh(QJsonObject mesh_json, int mesh_idx)
     {
-        auto &primitives = ctx->mesh(mesh_idx).meshPrimitives;
+        const auto &primitives = ctx->mesh(mesh_idx).meshPrimitives;
         auto primitives_json = mesh_json[GLTF2Import::KEY_PRIMITIVES].toArray();
 
         Q_ASSERT_X(primitives_json.size() == primitives.size(), "GLTF2DracoCompressor::compressMesh", "Bad primitive count");
@@ -210,7 +212,7 @@ private:
                 draco_ext[GLTF2Import::KEY_BUFFERVIEW] = newBufferViewIndex;
                 {
                     QJsonObject draco_ext_attr;
-                    for (const auto &[name, idx] : compressed.attributes) {
+                    for (const auto &attribute : compressed.attributes) {
 
                         // TODO the names aren't the correct ones, how to get them ?
                         // e.g. vertexNormal instead of NORMAL
@@ -219,7 +221,7 @@ private:
                             { "vertexNormal", "NORMAL" },
                             { "vertexPosition", "POSITION" }
                         };
-                        draco_ext_attr[nameMap[name]] = idx;
+                        draco_ext_attr[nameMap[attribute.first]] = attribute.second;
                     }
                     draco_ext[GLTF2Import::KEY_ATTRIBUTES] = draco_ext_attr;
                 }
@@ -250,6 +252,69 @@ private:
         compressed_primitive.primitive_json = primitive_json;
 
         return compressed_primitive;
+    }
+
+    void removeBufferViews(const std::set<int> &indices)
+    {
+        // First compute the new indicides of the buffer views
+        std::map<int, int> bufferViewIndex;
+        int currentOffset = 0;
+        for (int i = 0, n = bufferViews.size(); i < n; i++) {
+            if (indices.count(i) != 0) {
+                currentOffset++;
+            }
+            bufferViewIndex[i] = i - currentOffset;
+        }
+
+        // Fix them in the accessors
+        for (int i = 0; i < accessors.size(); i++) {
+            auto acc = accessors[i].toObject();
+
+            auto it = acc.find(GLTF2Import::KEY_BUFFERVIEW);
+            if (it != acc.end()) {
+                it.value() = bufferViewIndex.at(it.value().toInt());
+            }
+
+            accessors[i] = std::move(acc);
+        }
+
+        // Fix them in the meshes
+        for (int i = 0; i < meshes.size(); i++) {
+            auto m = meshes[i].toObject();
+            auto primitives = m[GLTF2Import::KEY_PRIMITIVES].toArray();
+            for (int p = 0; p < primitives.size(); p++) {
+                auto primitive = primitives[p].toObject();
+
+                auto ext_it = primitive.find(GLTF2Import::KEY_EXTENSIONS);
+                if (ext_it != primitive.end()) {
+                    auto ext = ext_it->toObject();
+
+                    auto draco_it = ext.find(GLTF2Import::KEY_KHR_DRACO_MESH_COMPRESSION_EXTENSION);
+                    if (draco_it != ext.end()) {
+                        auto draco = draco_it->toObject();
+                        draco[GLTF2Import::KEY_BUFFERVIEW] = bufferViewIndex.at(draco[GLTF2Import::KEY_BUFFERVIEW].toInt());
+                        *draco_it = std::move(draco);
+                    }
+
+                    *ext_it = std::move(ext);
+                }
+
+                primitives[p] = std::move(primitive);
+            }
+            m[GLTF2Import::KEY_PRIMITIVES] = std::move(primitives);
+            meshes[i] = std::move(m);
+        }
+
+        // Fix them in the images
+        // TODO
+
+        // Remove the buffer views
+        // (note: this loop could be merged with the earlier one
+        // but this would be a bit less readable imho)
+        for (int i = bufferViews.size(); i-- > 0;) {
+            if (indices.count(i) != 0)
+                bufferViews.erase(bufferViews.begin() + i);
+        }
     }
 
     // Add an extension if it is not already registered - this could be moved at a more generic place
