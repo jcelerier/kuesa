@@ -336,7 +336,7 @@ void GLTF2Importer::load()
 
     GLTF2Import::GLTF2Parser parser(m_sceneEntity, m_assignNames);
     auto ctx = GLTF2Import::GLTF2ContextPrivate::get(m_context);
-    *ctx = GLTF2Import::GLTF2ContextPrivate {};
+    *ctx = GLTF2Import::GLTF2ContextPrivate{};
 
     parser.setContext(ctx);
 

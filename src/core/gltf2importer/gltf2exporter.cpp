@@ -199,7 +199,7 @@ private:
         auto &eb = *compressed.buffer.get();
         int eb_size = static_cast<int>(eb.size());
 
-        compressed_primitive.compressedData = QByteArray { eb.data(), eb_size };
+        compressed_primitive.compressedData = QByteArray{ eb.data(), eb_size };
 
         // For now we allocate new bufferViews per compressed chunk; then we should do a pass to remove / replace unused bv ?
 
@@ -224,7 +224,7 @@ private:
                         // TODO the names aren't the correct ones, how to get them ?
                         // e.g. vertexNormal instead of NORMAL
                         // for the sake of testing, this dirty hack :
-                        static const QMap<QString, QString> nameMap {
+                        static const QMap<QString, QString> nameMap{
                             { "vertexNormal", "NORMAL" },
                             { "vertexPosition", "POSITION" }
                         };
@@ -534,7 +534,7 @@ void GLTF2Exporter::save(QUrl target)
         return;
     }
 
-    QFile out { target.toLocalFile() };
+    QFile out{ target.toLocalFile() };
     if (!out.open(QIODevice::WriteOnly)) {
         qCWarning(kuesa, "Could not open file to save GLTF");
         return;
