@@ -507,13 +507,6 @@ private:
         }
         return bufferViews;
     }
-
-    // Given an array of bufferViews, return the set of referred-to buffers
-    static std::set<int> buffersFromBufferViews(const QJsonArray &bufferViews)
-    {
-        std::set<int> buffers;
-        return buffers;
-    }
 };
 #endif
 
