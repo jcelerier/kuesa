@@ -72,6 +72,7 @@ const QLatin1String KEY_BUFFER = QLatin1String("buffer");
 const QLatin1String KEY_BUFFERVIEW = QLatin1String("bufferView");
 const QLatin1String KEY_ATTRIBUTES = QLatin1String("attributes");
 const QLatin1String KEY_BYTEOFFSET = QLatin1String("byteOffset");
+const QLatin1String KEY_BYTESTRIDE = QLatin1String("byteStride");
 const QLatin1String KEY_INDICES = QLatin1String("indices");
 #if defined(KUESA_DRACO_COMPRESSION)
 const QLatin1String KEY_KHR_DRACO_MESH_COMPRESSION_EXTENSION = QLatin1String("KHR_draco_mesh_compression");
